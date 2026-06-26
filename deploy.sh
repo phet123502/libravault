@@ -100,8 +100,7 @@ deactivate
 echo "[5/9] Building React frontend..."
 cd ${APP_DIR}/library_frontend
 npm install --unsafe-perm
-chmod +x node_modules/.bin/vite
-npm run build
+node node_modules/vite/bin/vite.js build
 # Build output goes to: library_frontend/dist/
 
 # ─── 6. GUNICORN SYSTEMD SERVICE ──────────────────────────────────────────────
