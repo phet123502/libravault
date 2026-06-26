@@ -41,8 +41,8 @@ echo "MySQL database and user created."
 # ─── 3. CLONE FROM GITHUB ─────────────────────────────────────────────────────
 echo "[3/9] Cloning project from GitHub..."
 if [ -d "${APP_DIR}/.git" ]; then
-    echo "Repo already exists, pulling latest..."
-    cd ${APP_DIR} && git pull
+    echo "Repo already exists, force resetting to latest..."
+    cd ${APP_DIR} && git fetch --all && git reset --hard origin/main
 else
     git clone https://github.com/phet123502/libravault.git ${APP_DIR}
 fi
