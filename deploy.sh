@@ -38,13 +38,14 @@ SQL
 
 echo "MySQL database and user created."
 
-# ─── 3. COPY PROJECT FILES ────────────────────────────────────────────────────
-echo "[3/9] Setting up project directory..."
-mkdir -p ${APP_DIR}
-
-# If you are running this locally on your EC2 instance after uploading via scp:
-#   scp -r ./library_backend ./library_frontend ubuntu@YOUR_EC2_IP:~/libravault/
-# The script assumes files are already at APP_DIR.
+# ─── 3. CLONE FROM GITHUB ─────────────────────────────────────────────────────
+echo "[3/9] Cloning project from GitHub..."
+if [ -d "${APP_DIR}/.git" ]; then
+    echo "Repo already exists, pulling latest..."
+    cd ${APP_DIR} && git pull
+else
+    git clone https://github.com/phet123502/libravault.git ${APP_DIR}
+fi
 
 # ─── 4. DJANGO BACKEND SETUP ──────────────────────────────────────────────────
 echo "[4/9] Setting up Django backend..."
