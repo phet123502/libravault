@@ -99,7 +99,8 @@ deactivate
 # ─── 5. REACT FRONTEND BUILD ──────────────────────────────────────────────────
 echo "[5/9] Building React frontend..."
 cd ${APP_DIR}/library_frontend
-npm install
+npm install --unsafe-perm
+chmod +x node_modules/.bin/vite
 npm run build
 # Build output goes to: library_frontend/dist/
 
