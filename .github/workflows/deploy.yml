@@ -1,0 +1,60 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # needed to detect changed files
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ubuntu/libravault
+            git fetch --all
+            git reset --hard origin/main
+
+            # Check if frontend files changed
+            FRONTEND_CHANGED=$(git diff HEAD@{1} HEAD --name-only | grep "^library_frontend/" | wc -l)
+
+            # Check if backend files changed
+            BACKEND_CHANGED=$(git diff HEAD@{1} HEAD --name-only | grep "^library_backend/" | wc -l)
+
+            # Rebuild React if frontend changed
+            if [ "$FRONTEND_CHANGED" -gt "0" ]; then
+              echo "Frontend changed — rebuilding React..."
+              cd /home/ubuntu/libravault/library_frontend
+              npm install --unsafe-perm
+              node node_modules/vite/bin/vite.js build
+              echo "React build done."
+            else
+              echo "No frontend changes — skipping React build."
+            fi
+
+            # Restart Django if backend changed
+            if [ "$BACKEND_CHANGED" -gt "0" ]; then
+              echo "Backend changed — restarting Django..."
+              cd /home/ubuntu/libravault/library_backend
+              source venv/bin/activate
+              pip install -r requirements.txt
+              DJANGO_SETTINGS_MODULE=library_backend.settings_prod python manage.py migrate
+              deactivate
+              systemctl restart libravault
+              echo "Django restarted."
+            else
+              echo "No backend changes — skipping Django restart."
+            fi
+
+            echo "Deployment complete!"
