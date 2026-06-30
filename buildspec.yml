@@ -22,5 +22,4 @@ artifacts:
     - library_frontend/dist/**/*
     - appspec.yml
     - scripts/**/*
-    -  .sh
   discard-paths: no
